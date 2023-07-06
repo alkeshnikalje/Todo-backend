@@ -72,8 +72,32 @@ app.post('/users/todos',userAuth, async(req,res)=>{
     const todo = new Todo(req.body);
     await todo.save();
     res.json({title : todo.title,description: todo.description,id: todo.id});
+});
+
+
+app.put('/users/todos/:todoId',userAuth,async(req,res)=>{
+    const todo = await Todo.findByIdAndUpdate(req.params.todoId,req.body,{new : true});
+    if(todo){
+        res.json({message: "todo updated successfully"});
+    }else{
+        res.status(404).json({message: "todo not found"});
+    }
+});
+
+app.get('/users/todos',userAuth, async(req,res)=>{
+    const todos = await Todo.find({});
+    res.json({todos});
 })
 
+app.delete('/users/todos/:todoId',userAuth,async(req,res)=>{
+    const todoToBeDeleted = await Todo.findById(req.params.todoId);
+    if(todoToBeDeleted){
+        await todoToBeDeleted.deleteOne();
+        res.json({message: "successfully deleted"});
+    }else{
+        res.status(404).json({message: "todo not found"});
+    }
+})
 
 
 app.listen(3000,()=>{
